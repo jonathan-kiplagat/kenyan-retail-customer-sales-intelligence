@@ -1,0 +1,8 @@
+question,hypothesis,test,statistic,p_value,effect_size,ci_95,decision
+Q1,Promotion lines have more units per line (pooled),Mann-Whitney U (one-sided),500594.0,6.71306035460482e-11,r = 0.19,+0.49 units (0.21 to 0.93),Reject H0
+Q1,Category units per day are higher on campaign days,Mann-Whitney U per category (Holm),,,5 of 6 categories significant,see per-category table,Reject H0 in 5 of 6 categories
+Q2,Order value differs across stores,Kruskal-Wallis H,13.855069008078312,0.01655672431813486,epsilon-squared = 0.003,see store CI chart,Reject H0
+Q2,Customer total spend differs by preferred store (robustness),Kruskal-Wallis H,2.4044906948531057,0.7908051802962489,epsilon-squared = 0.000,-,Fail to reject H0
+Q3,Units per line differs across categories,Kruskal-Wallis H,252.99862506443637,3.748033075569054e-52,epsilon-squared = 0.083,-,Reject H0
+Q3,Payment method differs across categories,Chi-square,28.023431017932467,0.042845649099109026,Cramer's V = 0.056,-,Reject H0
+Q3,Time of day differs across categories,Chi-square,16.885586267530027,0.325749976873813,Cramer's V = 0.043,-,Fail to reject H0
