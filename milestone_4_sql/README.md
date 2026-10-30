@@ -110,5 +110,28 @@ products (PK product_id) ──< sales_transactions (PK transaction_id) >── 
 - **The database's generated revenue, discount and profit match the Python-cleaned values on all 2,988 lines** (KES 2,179,214.72 in both).
 - The full rebuild (`.\sql\run_sql.ps1`) runs all seven scripts in about 4 seconds with no errors.
 
-## Still to do (project owner)
-DBeaver screenshots for the submission: the connection, the ER diagram (right-click the `retail` schema → *View Diagram*), and the results of Q4.1, Q4.4, Q6.2 and Q7.2. Save them in `milestone_4_sql/screenshots/`.
+## DBeaver evidence
+
+**Connection to `duka_bora`: the 7 tables in the `retail` schema**
+
+![DBeaver connection](screenshots/01_connection.png)
+
+**ER diagram: primary and foreign key relationships (plus the analysis views)**
+
+![ER diagram](screenshots/02_er_diagram.png)
+
+**Q4.1: store revenue ranking (RANK and a window SUM)**
+
+![Store revenue ranking](screenshots/03_store_revenue.png)
+
+**Q4.4: monthly trend with LAG, rolling average and running total.** The first rows show `NULL` growth because there is no earlier month or year to compare against.
+
+![Monthly trend](screenshots/04_monthly_trend.png)
+
+**Q6.2: quarterly cohort retention.** `NULL` = quarter not yet observable.
+
+![Cohort retention](screenshots/05_cohort_retention.png)
+
+**Q7.2: RFM segment summary**
+
+![RFM segments](screenshots/06_rfm_segments.png)

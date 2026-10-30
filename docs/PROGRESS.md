@@ -9,7 +9,7 @@ Legend: ✅ done and verified · 🔄 in progress · ⏳ pending · 🙋 needs t
 | **M1** Problem framing and data acquisition | ✅ | `milestone_1_problem_framing/README.md`, notebooks 01–02 |
 | **M2** Data cleaning and preparation | ✅ | `milestone_2_data_cleaning/README.md`, notebook 03, `data/cleaned/`, audit: all 126 issues detected |
 | **M3** Exploratory data analysis | ✅ | `milestone_3_eda/README.md`, notebook 04 (18 charts), `src/analysis/eda.py` |
-| **M4** SQL analytics (PostgreSQL + DBeaver) | ✅ (🙋 screenshots) | `milestone_4_sql/README.md`, `sql/01-07`, `milestone_4_sql/outputs/`; owner to add DBeaver screenshots |
+| **M4** SQL analytics (PostgreSQL + DBeaver) | ✅ | `milestone_4_sql/README.md`, `sql/01-07`, `milestone_4_sql/outputs/`, 6 DBeaver screenshots |
 | **M5** Statistical analysis | ⏳ | |
 | **M6** Predictive modelling | ⏳ | |
 | **M7** Power BI dashboard | ⏳ 🙋 | The owner builds the `.pbix` from the provided guide, then takes screenshots |
