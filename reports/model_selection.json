@@ -1,0 +1,12 @@
+{
+  "forecast_model": "Holt exponential smoothing",
+  "rf_params": {
+    "n_estimators": 300,
+    "max_depth": 3,
+    "min_samples_leaf": 1
+  },
+  "holt_damped": true,
+  "selection_metric": "validation MAE (Jan-Jun 2025, walk-forward)",
+  "churn_model": "Baseline: recency only",
+  "inactivity_threshold_days": 180
+}
