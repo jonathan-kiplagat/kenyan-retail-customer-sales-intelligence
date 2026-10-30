@@ -1,0 +1,21 @@
+promotion_id,promotion_name,promotion_type,start_date,end_date,target_category,discount_percentage
+PR01,New Year Grocery Saver,Seasonal,2024-01-02,2024-01-14,Food and Groceries,10.0
+PR02,Back-to-School January,Back-to-school,2024-01-02,2024-01-21,Clothing,15.0
+PR03,Valentine's Self-Care Week,Seasonal,2024-02-07,2024-02-14,Personal Care,12.0
+PR04,Easter Feast Deals,Holiday,2024-03-22,2024-04-01,Food and Groceries,10.0
+PR05,Eid Celebration Drinks,Holiday,2024-04-03,2024-04-12,Beverages,12.0
+PR06,Back-to-School May,Back-to-school,2024-04-25,2024-05-05,Clothing,15.0
+PR07,Mid-Year Home Clean,Category,2024-06-20,2024-07-07,Household Products,15.0
+PR08,Back-to-School September,Back-to-school,2024-08-25,2024-09-05,Clothing,15.0
+PR09,Black Friday Electronics,Seasonal,2024-11-25,2024-12-01,Electronics,20.0
+PR10,Festive Season Drinks,Holiday,2024-12-15,2024-12-31,Beverages,15.0
+PR11,New Year Grocery Saver,Seasonal,2025-01-02,2025-01-14,Food and Groceries,10.0
+PR12,Back-to-School January,Back-to-school,2025-01-02,2025-01-19,Clothing,15.0
+PR13,Valentine's Self-Care Week,Seasonal,2025-02-07,2025-02-14,Personal Care,12.0
+PR14,Eid Celebration Drinks,Holiday,2025-03-25,2025-04-02,Beverages,12.0
+PR15,Easter Feast Deals,Holiday,2025-04-10,2025-04-21,Food and Groceries,10.0
+PR16,Back-to-School May,Back-to-school,2025-04-24,2025-05-04,Clothing,15.0
+PR17,Mid-Year Home Clean,Category,2025-06-19,2025-07-06,Household Products,15.0
+PR18,Back-to-School September,Back-to-school,2025-08-24,2025-09-04,Clothing,15.0
+PR19,Black Friday Electronics,Seasonal,2025-11-24,2025-11-30,Electronics,20.0
+PR20,Festive Season Drinks,Holiday,2025-12-15,2025-12-31,Beverages,15.0

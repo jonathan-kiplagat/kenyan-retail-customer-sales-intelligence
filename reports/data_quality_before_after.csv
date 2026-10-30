@@ -1,0 +1,11 @@
+,raw_before,cleaned_after,change
+rows,3000,2988,-12
+exact_duplicate_rows,12,0,-12
+duplicate_transaction_ids,12,0,-12
+missing_customer_id,25,21,-4
+missing_payment_method,10,0,-10
+non_standard_payment_labels,30,0,-30
+dates_not_in_iso_format,15,0,-15
+total_amount_not_numeric,10,0,-10
+rows_failing_reconciliation,10,0,-10
+quantity_above_100,4,0,-4

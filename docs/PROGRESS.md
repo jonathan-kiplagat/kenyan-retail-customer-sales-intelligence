@@ -5,9 +5,9 @@ Legend: ✅ done and verified · 🔄 in progress · ⏳ pending · 🙋 needs t
 | Phase / Milestone | Status | Evidence |
 |---|---|---|
 | Phase 1: plan and dataset design | ✅ Approved 2026-10-30 | Plan in project conversation |
-| Phase 2: generate data, validate 3,000 rows | ✅ | `data/raw/`, `tests/test_raw_data.py` (8/8 pass) |
+| Phase 2: generate data, validate 3,000 rows | ✅ | `data/raw/`, `tests/` (17/17 pass) |
 | **M1** Problem framing and data acquisition | ✅ | `milestone_1_problem_framing/README.md`, notebooks 01–02 |
-| **M2** Data cleaning and preparation | ⏳ | |
+| **M2** Data cleaning and preparation | ✅ | `milestone_2_data_cleaning/README.md`, notebook 03, `data/cleaned/`, audit: all 126 issues detected |
 | **M3** Exploratory data analysis | ⏳ | |
 | **M4** SQL analytics (PostgreSQL + DBeaver) | ⏳ 🙋 | Needs the PostgreSQL password in a local `.env` file; DBeaver screenshots |
 | **M5** Statistical analysis | ⏳ | |
