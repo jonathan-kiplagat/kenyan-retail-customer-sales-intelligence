@@ -12,7 +12,7 @@ Legend: ✅ done and verified · 🔄 in progress · ⏳ pending · 🙋 needs t
 | **M4** SQL analytics (PostgreSQL + DBeaver) | ✅ | `milestone_4_sql/README.md`, `sql/01-07`, `milestone_4_sql/outputs/`, 6 DBeaver screenshots |
 | **M5** Statistical analysis | ✅ | `milestone_5_statistics/README.md`, notebook 05, `reports/hypothesis_test_results.csv` |
 | **M6** Predictive modelling | ✅ | `milestone_6_predictive_modeling/README.md`, notebooks 06–07, forecast + at-risk outputs in `data/processed/` |
-| **M7** Power BI dashboard | ⏳ 🙋 | The owner builds the `.pbix` from the provided guide, then takes screenshots |
+| **M7** Power BI dashboard | ✅ | `milestone_7_dashboard/README.md`, `Duka_Bora_Dashboard.pbix` (5 pages), 5 screenshots, `data/powerbi/` star schema, headline figures verified against M3–M6 |
 | **M8** Documentation and presentation | ⏳ | |
 
 ## Scope changes

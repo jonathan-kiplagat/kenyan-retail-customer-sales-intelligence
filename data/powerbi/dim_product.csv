@@ -1,0 +1,41 @@
+product_id,product_name,category,brand,pack_size,selling_price_kes,unit_cost_kes
+P001,Maize Flour,Food and Groceries,Shamba Gold,2 kg,185,162
+P002,Wheat Flour,Food and Groceries,Shamba Gold,2 kg,195,170
+P003,Long Grain Rice,Food and Groceries,Pwani Grains,5 kg,1050,920
+P004,White Sugar,Food and Groceries,Sukari Bora,2 kg,330,298
+P005,Vegetable Cooking Oil,Food and Groceries,Mafuta Safi,3 L,1120,985
+P006,Fresh Milk,Food and Groceries,Maziwa Fresh,500 ml,65,55
+P007,White Bread,Food and Groceries,Mkate Poa,400 g,70,60
+P008,Eggs Tray,Food and Groceries,Kuku Farm,30 pcs,480,420
+P009,Black Tea Leaves,Food and Groceries,Kericho Highlands,500 g,320,265
+P010,Dry Beans,Food and Groceries,Shamba Gold,1 kg,210,180
+P011,Bottled Water,Beverages,Aqua Mlima,1.5 L,80,60
+P012,Cola Soda,Beverages,Fizzy Kola,2 L,210,165
+P013,Mango Juice,Beverages,Tunda,1 L,250,195
+P014,Instant Coffee,Beverages,Kahawa Gold,100 g,550,430
+P015,Energy Drink,Beverages,Nguvu,500 ml,150,115
+P016,Drinking Chocolate,Beverages,Cocoa Joy,400 g,480,370
+P017,Natural Yoghurt,Beverages,Maziwa Fresh,500 ml,140,108
+P018,Laundry Detergent,Household Products,Safi Wash,1 kg,380,290
+P019,Bar Soap,Household Products,Safi Wash,800 g,230,175
+P020,Dishwashing Liquid,Household Products,Ng'aa,750 ml,260,195
+P021,Toilet Paper,Household Products,Soft Touch,10 rolls,450,340
+P022,Bleach,Household Products,Ng'aa,1 L,180,130
+P023,Insecticide Spray,Household Products,Kinga,400 ml,520,385
+P024,Mop and Bucket Set,Household Products,Safi Home,1 set,1250,880
+P025,Toothpaste,Personal Care,Tabasamu,150 g,220,155
+P026,Body Lotion,Personal Care,Ngozi,400 ml,450,310
+P027,Shampoo,Personal Care,Nywele,400 ml,520,360
+P028,Sanitary Pads,Personal Care,Comfy,10 pcs,150,105
+P029,Deodorant Spray,Personal Care,Fresh Day,150 ml,380,260
+P030,Baby Diapers,Personal Care,Mtoto Care,40 pcs,1350,1000
+P031,Men's Cotton T-Shirt,Clothing,Kitenge Wear,1 pc,850,470
+P032,Women's Kitenge Dress,Clothing,Kitenge Wear,1 pc,2400,1300
+P033,School Uniform Set,Clothing,Shule Smart,1 set,1800,1050
+P034,Denim Jeans,Clothing,Urban Threads,1 pc,2200,1200
+P035,Canvas Shoes,Clothing,Hatua,1 pair,1500,850
+P036,Smartphone 64GB,Electronics,Simu X,1 unit,14999,12600
+P037,32-inch LED TV,Electronics,Skyview,1 unit,21999,18400
+P038,Bluetooth Earphones,Electronics,Sauti,1 unit,1800,1350
+P039,Electric Kettle,Electronics,Jiko Smart,1.7 L,2500,1950
+P040,Solar Lantern,Electronics,Mwangaza,1 unit,3200,2600

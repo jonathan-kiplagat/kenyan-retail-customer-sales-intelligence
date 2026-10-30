@@ -1,0 +1,7 @@
+store_id,store_name,town,county,store_format,opening_date,floor_area_sqm
+S01,Duka Bora Nairobi CBD,Nairobi CBD,Nairobi,Flagship,2016-03-01,2400
+S02,Duka Bora Westlands,Westlands,Nairobi,Flagship,2018-08-15,2100
+S03,Duka Bora Thika,Thika,Kiambu,Compact,2021-02-01,900
+S04,Duka Bora Mombasa,Mombasa Town,Mombasa,Standard,2017-11-20,1600
+S05,Duka Bora Kisumu,Kisumu Town,Kisumu,Standard,2019-06-10,1300
+S06,Duka Bora Nakuru,Nakuru Town,Nakuru,Standard,2020-09-01,1400
