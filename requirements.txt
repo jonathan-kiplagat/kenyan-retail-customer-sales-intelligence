@@ -20,5 +20,8 @@ nbconvert>=7.16
 psycopg[binary]>=3.2
 python-dotenv>=1.0
 
+# Presentation (Milestone 8)
+python-pptx>=1.0
+
 # Testing
 pytest>=8.3

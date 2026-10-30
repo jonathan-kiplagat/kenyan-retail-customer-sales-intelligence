@@ -13,7 +13,7 @@ Legend: ✅ done and verified · 🔄 in progress · ⏳ pending · 🙋 needs t
 | **M5** Statistical analysis | ✅ | `milestone_5_statistics/README.md`, notebook 05, `reports/hypothesis_test_results.csv` |
 | **M6** Predictive modelling | ✅ | `milestone_6_predictive_modeling/README.md`, notebooks 06–07, forecast + at-risk outputs in `data/processed/` |
 | **M7** Power BI dashboard | ✅ | `milestone_7_dashboard/README.md`, `Duka_Bora_Dashboard.pbix` (5 pages), 5 screenshots, `data/powerbi/` star schema, headline figures verified against M3–M6 |
-| **M8** Documentation and presentation | ⏳ | |
+| **M8** Documentation and presentation | ✅ | `milestone_8_documentation/` (final report, methodology, SQL docs, model evaluation, defence Q&A), `presentations/Duka_Bora_Capstone_Defence.pptx`; all notebooks re-run end to end, 28/28 tests pass |
 
 ## Scope changes
 - 2026-10-30: KNBS CPI/inflation and census population data removed at the owner's request. Public holidays remain as the public context data.
