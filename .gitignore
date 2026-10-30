@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Virtual environment
+.venv/
+venv/
+
+# Secrets (PostgreSQL password lives here - never commit it)
+.env
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Power BI temp/lock files
+~$*.pbix
+*.pbix.bak

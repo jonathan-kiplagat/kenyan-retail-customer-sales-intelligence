@@ -1,0 +1,127 @@
+table,record_key,column,issue_type,original_value,injected_value
+sales_transactions,TXN02012,customer_id,missing_value,C1516,
+sales_transactions,TXN02407,customer_id,missing_value,C0026,
+sales_transactions,TXN00008,customer_id,missing_value,C0530,
+sales_transactions,TXN01008,customer_id,missing_value,C1056,
+sales_transactions,TXN01830,customer_id,missing_value,C0266,
+sales_transactions,TXN02272,customer_id,missing_value,C0424,
+sales_transactions,TXN00397,customer_id,missing_value,C0029,
+sales_transactions,TXN01018,customer_id,missing_value,C1163,
+sales_transactions,TXN00597,customer_id,missing_value,C0663,
+sales_transactions,TXN01278,customer_id,missing_value,C1141,
+sales_transactions,TXN00706,customer_id,missing_value,C0632,
+sales_transactions,TXN00538,customer_id,missing_value,C0891,
+sales_transactions,TXN02478,customer_id,missing_value,C0358,
+sales_transactions,TXN01591,customer_id,missing_value,C0171,
+sales_transactions,TXN00687,customer_id,missing_value,C0515,
+sales_transactions,TXN01913,customer_id,missing_value,C1483,
+sales_transactions,TXN01565,customer_id,missing_value,C1355,
+sales_transactions,TXN02887,customer_id,missing_value,C0330,
+sales_transactions,TXN00643,customer_id,missing_value,C0691,
+sales_transactions,TXN01866,customer_id,missing_value,C1405,
+sales_transactions,TXN02286,customer_id,missing_value,C1600,
+sales_transactions,TXN01991,customer_id,missing_value,C0103,
+sales_transactions,TXN00735,customer_id,missing_value,C0174,
+sales_transactions,TXN00309,customer_id,missing_value,C0226,
+sales_transactions,TXN00058,customer_id,missing_value,C0619,
+sales_transactions,TXN01892,payment_method,missing_value,Debit/Credit Card,
+sales_transactions,TXN00707,payment_method,missing_value,Cash,
+sales_transactions,TXN02511,payment_method,missing_value,M-Pesa,
+sales_transactions,TXN01514,payment_method,missing_value,Bank Transfer,
+sales_transactions,TXN02525,payment_method,missing_value,M-Pesa,
+sales_transactions,TXN00785,payment_method,missing_value,M-Pesa,
+sales_transactions,TXN00125,payment_method,missing_value,M-Pesa,
+sales_transactions,TXN01656,payment_method,missing_value,M-Pesa,
+sales_transactions,TXN01196,payment_method,missing_value,M-Pesa,
+sales_transactions,TXN00458,payment_method,missing_value,Cash,
+sales_transactions,TXN00197,payment_method,inconsistent_label,M-Pesa,m-pesa 
+sales_transactions,TXN00825,payment_method,inconsistent_label,Cash, Cash
+sales_transactions,TXN01835,payment_method,inconsistent_label,M-Pesa,mpesa
+sales_transactions,TXN02096,payment_method,inconsistent_label,Cash,CASH 
+sales_transactions,TXN00741,payment_method,inconsistent_label,M-Pesa,M-PESA
+sales_transactions,TXN02978,payment_method,inconsistent_label,M-Pesa,M-PESA
+sales_transactions,TXN01804,payment_method,inconsistent_label,M-Pesa,mpesa
+sales_transactions,TXN00501,payment_method,inconsistent_label,M-Pesa,mpesa
+sales_transactions,TXN01592,payment_method,inconsistent_label,M-Pesa,mpesa
+sales_transactions,TXN01547,payment_method,inconsistent_label,M-Pesa,m-pesa 
+sales_transactions,TXN02818,payment_method,inconsistent_label,Cash,CASH 
+sales_transactions,TXN01068,payment_method,inconsistent_label,M-Pesa,M-PESA
+sales_transactions,TXN02474,payment_method,inconsistent_label,Cash,CASH 
+sales_transactions,TXN02113,payment_method,inconsistent_label,M-Pesa,MPESA
+sales_transactions,TXN02212,payment_method,inconsistent_label,Cash,cash
+sales_transactions,TXN00883,payment_method,inconsistent_label,M-Pesa,M-PESA
+sales_transactions,TXN00556,payment_method,inconsistent_label,Debit/Credit Card,credit card
+sales_transactions,TXN00091,payment_method,inconsistent_label,M-Pesa,mpesa
+sales_transactions,TXN01515,payment_method,inconsistent_label,M-Pesa,mpesa
+sales_transactions,TXN02409,payment_method,inconsistent_label,Cash,CASH 
+sales_transactions,TXN02703,payment_method,inconsistent_label,Debit/Credit Card,credit card
+sales_transactions,TXN02350,payment_method,inconsistent_label,M-Pesa,M-PESA
+sales_transactions,TXN00037,payment_method,inconsistent_label,M-Pesa,m-pesa 
+sales_transactions,TXN00077,payment_method,inconsistent_label,M-Pesa,MPESA
+sales_transactions,TXN02685,payment_method,inconsistent_label,M-Pesa,M-PESA
+sales_transactions,TXN01237,payment_method,inconsistent_label,Bank Transfer,Bank
+sales_transactions,TXN02014,payment_method,inconsistent_label,Debit/Credit Card,card
+sales_transactions,TXN00087,payment_method,inconsistent_label,Debit/Credit Card,credit card
+sales_transactions,TXN00082,payment_method,inconsistent_label,M-Pesa,m-pesa 
+sales_transactions,TXN00327,payment_method,inconsistent_label,M-Pesa,M-PESA
+sales_transactions,TXN02037,transaction_date,inconsistent_date_format,2025-06-02,02/06/2025
+sales_transactions,TXN01996,transaction_date,inconsistent_date_format,2025-05-25,25/05/2025
+sales_transactions,TXN01963,transaction_date,inconsistent_date_format,2025-05-14,14/05/2025
+sales_transactions,TXN01190,transaction_date,inconsistent_date_format,2024-11-07,07/11/2024
+sales_transactions,TXN02445,transaction_date,inconsistent_date_format,2025-09-04,04/09/2025
+sales_transactions,TXN00326,transaction_date,inconsistent_date_format,2024-04-03,03/04/2024
+sales_transactions,TXN00018,transaction_date,inconsistent_date_format,2024-01-06,06/01/2024
+sales_transactions,TXN02289,transaction_date,inconsistent_date_format,2025-07-29,29/07/2025
+sales_transactions,TXN02964,transaction_date,inconsistent_date_format,2025-12-27,27/12/2025
+sales_transactions,TXN02100,transaction_date,inconsistent_date_format,2025-06-16,16/06/2025
+sales_transactions,TXN02164,transaction_date,inconsistent_date_format,2025-06-30,30/06/2025
+sales_transactions,TXN01030,transaction_date,inconsistent_date_format,2024-09-24,24/09/2024
+sales_transactions,TXN01065,transaction_date,inconsistent_date_format,2024-10-03,03/10/2024
+sales_transactions,TXN00338,transaction_date,inconsistent_date_format,2024-04-06,06/04/2024
+sales_transactions,TXN00234,transaction_date,inconsistent_date_format,2024-03-15,15/03/2024
+sales_transactions,TXN02110,total_amount,numeric_stored_as_text,459.0,KES 459.00
+sales_transactions,TXN02879,total_amount,numeric_stored_as_text,540.0,KES 540.00
+sales_transactions,TXN01208,total_amount,numeric_stored_as_text,210.0,KES 210.00
+sales_transactions,TXN01919,total_amount,numeric_stored_as_text,3182.4,"KES 3,182.40"
+sales_transactions,TXN01021,total_amount,numeric_stored_as_text,80.0,KES 80.00
+sales_transactions,TXN01964,total_amount,numeric_stored_as_text,343.0,KES 343.00
+sales_transactions,TXN00963,total_amount,numeric_stored_as_text,1700.0,"KES 1,700.00"
+sales_transactions,TXN02911,total_amount,numeric_stored_as_text,486.2,KES 486.20
+sales_transactions,TXN00011,total_amount,numeric_stored_as_text,280.0,KES 280.00
+sales_transactions,TXN01184,total_amount,numeric_stored_as_text,520.0,KES 520.00
+sales_transactions,TXN02095,quantity,outlier_entry_error,1,999
+sales_transactions,TXN02219,quantity,outlier_entry_error,1,999
+sales_transactions,TXN00320,quantity,outlier_entry_error,1,999
+sales_transactions,TXN01834,quantity,outlier_entry_error,1,999
+sales_transactions,TXN01722,unit_price,price_typo,2288.0,22880.0
+sales_transactions,TXN00705,unit_price,price_typo,180.0,1800.0
+sales_transactions,TXN00657,unit_price,price_typo,150.0,1500.0
+sales_transactions,TXN00697,total_amount,calculation_mismatch,884.0,1040.0
+sales_transactions,TXN01415,total_amount,calculation_mismatch,204.0,240.0
+sales_transactions,TXN01807,total_amount,calculation_mismatch,308.7,343.0
+sales_transactions,TXN01915,total_amount,calculation_mismatch,751.4,884.0
+sales_transactions,TXN01809,total_amount,calculation_mismatch,617.4,686.0
+sales_transactions,TXN01912,total_amount,calculation_mismatch,1591.2,1872.0
+sales_transactions,TXN00856,(entire row),duplicate_row,,row repeated
+sales_transactions,TXN02297,(entire row),duplicate_row,,row repeated
+sales_transactions,TXN02731,(entire row),duplicate_row,,row repeated
+sales_transactions,TXN00957,(entire row),duplicate_row,,row repeated
+sales_transactions,TXN02589,(entire row),duplicate_row,,row repeated
+sales_transactions,TXN01129,(entire row),duplicate_row,,row repeated
+sales_transactions,TXN02393,(entire row),duplicate_row,,row repeated
+sales_transactions,TXN02442,(entire row),duplicate_row,,row repeated
+sales_transactions,TXN00120,(entire row),duplicate_row,,row repeated
+sales_transactions,TXN02982,(entire row),duplicate_row,,row repeated
+sales_transactions,TXN00849,(entire row),duplicate_row,,row repeated
+sales_transactions,TXN02507,(entire row),duplicate_row,,row repeated
+products,P007,category,inconsistent_label,Food and Groceries,food & groceries
+products,P026,category,inconsistent_label,Personal Care,Personal care 
+stores,S06,county,inconsistent_label,Nakuru, nakuru
+customers,C0874,gender,inconsistent_label,Female,F
+customers,C0291,gender,inconsistent_label,Female,F
+customers,C1520,gender,inconsistent_label,Female,F
+customers,C1631,gender,inconsistent_label,Male,m
+customers,C0375,gender,inconsistent_label,Female,F
+customers,C1020,gender,inconsistent_label,Male,m
+customers,C0821,gender,inconsistent_label,Female,F
+customers,C1642,gender,inconsistent_label,Female,F
