@@ -73,7 +73,8 @@ Clicking any bar or point cross-filters the rest of the page.
 - **RFM segments** by customer count and by lifetime revenue.
 - **Customer status donut:** one-off, active established, at risk, and walk-in only.
 - **Quarterly cohort retention matrix.**
-- **Customer table.**
+- **Win-back list:** the 249 at-risk customers with spend, recency, RFM segment and churn probability. Its total
+  (KES 541,641) matches the Value at Risk card.
 - **Filtering:** a `preferred_store` slicer filters this page. The customer visuals describe each customer at
   31 Dec 2025, so the date slicer intentionally does not change them.
 
