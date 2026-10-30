@@ -20,3 +20,6 @@ Thumbs.db
 # Power BI temp/lock files
 ~$*.pbix
 *.pbix.bak
+
+# Claude Code local settings (personal, not shared)
+.claude/settings.local.json
