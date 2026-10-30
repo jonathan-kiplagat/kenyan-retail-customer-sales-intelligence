@@ -1,0 +1,259 @@
+SET search_path TO retail;
+SET
+SELECT
+    RANK() OVER (ORDER BY SUM(s.total_amount) DESC)                    AS revenue_rank,
+    st.store_name,
+    st.county,
+    COUNT(DISTINCT o.order_id)                                         AS orders,
+    SUM(s.total_amount)                                                AS revenue_kes,
+    SUM(s.profit)                                                      AS profit_kes,
+    ROUND(100.0 * SUM(s.profit) / SUM(s.total_amount), 1)              AS margin_pct,
+    ROUND(100.0 * SUM(s.total_amount) / SUM(SUM(s.total_amount)) OVER (), 1) AS revenue_share_pct
+FROM sales_transactions s
+JOIN orders o  ON o.order_id = s.order_id
+JOIN stores st ON st.store_id = o.store_id
+GROUP BY st.store_name, st.county
+ORDER BY revenue_rank;
+ revenue_rank |      store_name       | county  | orders | revenue_kes | profit_kes | margin_pct | revenue_share_pct 
+--------------+-----------------------+---------+--------+-------------+------------+------------+-------------------
+            1 | Duka Bora Nairobi CBD | Nairobi |    643 |   525975.29 |  127985.61 |       24.3 |              24.1
+            2 | Duka Bora Westlands   | Nairobi |    482 |   433183.51 |  112527.07 |       26.0 |              19.9
+            3 | Duka Bora Nakuru      | Nakuru  |    371 |   335755.02 |   85656.82 |       25.5 |              15.4
+            4 | Duka Bora Kisumu      | Kisumu  |    356 |   317704.96 |   71513.16 |       22.5 |              14.6
+            5 | Duka Bora Mombasa     | Mombasa |    458 |   309860.50 |   78976.18 |       25.5 |              14.2
+            6 | Duka Bora Thika       | Kiambu  |    340 |   256735.44 |   62143.28 |       24.2 |              11.8
+(6 rows)
+
+SELECT *
+FROM (
+    SELECT
+        DENSE_RANK() OVER (ORDER BY SUM(s.profit) DESC)        AS profit_rank,
+        p.product_name,
+        p.category,
+        SUM(s.quantity)                                        AS units,
+        SUM(s.total_amount)                                    AS revenue_kes,
+        SUM(s.profit)                                          AS profit_kes,
+        ROUND(100.0 * SUM(s.profit) / SUM(s.total_amount), 1)  AS margin_pct
+    FROM sales_transactions s
+    JOIN products p ON p.product_id = s.product_id
+    GROUP BY p.product_name, p.category
+) ranked
+WHERE profit_rank <= 10
+ORDER BY profit_rank;
+ profit_rank |     product_name      |      category      | units | revenue_kes | profit_kes | margin_pct 
+-------------+-----------------------+--------------------+-------+-------------+------------+------------
+           1 | School Uniform Set    | Clothing           |    88 |   155023.20 |   60901.20 |       39.3
+           2 | Women's Kitenge Dress | Clothing           |    49 |   115675.20 |   50623.20 |       43.8
+           3 | Denim Jeans           | Clothing           |    49 |   107681.20 |   47297.20 |       43.9
+           4 | Men's Cotton T-Shirt  | Clothing           |   132 |   109702.70 |   46609.90 |       42.5
+           5 | Canvas Shoes          | Clothing           |    72 |   106557.00 |   44099.00 |       41.4
+           6 | Smartphone 64GB       | Electronics        |     9 |   137391.00 |   21975.00 |       16.0
+           7 | Electric Kettle       | Electronics        |    40 |   100900.00 |   21418.00 |       21.2
+           8 | Baby Diapers          | Personal Care      |    46 |    62830.08 |   15790.08 |       25.1
+           9 | Bluetooth Earphones   | Electronics        |    35 |    62971.20 |   14911.20 |       23.7
+          10 | Vegetable Cooking Oil | Food and Groceries |   119 |   134224.00 |   14566.20 |       10.9
+(10 rows)
+
+SELECT
+    p.category,
+    COUNT(*)                                               AS lines,
+    SUM(s.quantity)                                        AS units,
+    SUM(s.total_amount)                                    AS revenue_kes,
+    SUM(s.profit)                                          AS profit_kes,
+    ROUND(100.0 * SUM(s.profit) / SUM(s.total_amount), 1)  AS margin_pct,
+    ROUND(100.0 * SUM(s.profit) / SUM(SUM(s.profit)) OVER (), 1) AS profit_share_pct,
+    CASE
+        WHEN SUM(s.profit) / SUM(s.total_amount) >= 0.35 THEN 'High margin'
+        WHEN SUM(s.profit) / SUM(s.total_amount) >= 0.20 THEN 'Medium margin'
+        ELSE 'Low margin'
+    END                                                    AS margin_band
+FROM sales_transactions s
+JOIN products p ON p.product_id = s.product_id
+GROUP BY p.category
+HAVING SUM(s.total_amount) >= 100000
+ORDER BY profit_kes DESC;
+      category      | lines | units | revenue_kes | profit_kes | margin_pct | profit_share_pct |  margin_band  
+--------------------+-------+-------+-------------+------------+------------+------------------+---------------
+ Clothing           |   301 |   390 |   594639.30 |  249530.50 |       42.0 |             46.3 | High margin
+ Electronics        |   104 |   106 |   409970.60 |   75492.60 |       18.4 |             14.0 | Low margin
+ Food and Groceries |  1106 |  2010 |   553940.20 |   64853.12 |       11.7 |             12.0 | Low margin
+ Personal Care      |   355 |   459 |   187375.84 |   53485.84 |       28.5 |              9.9 | Medium margin
+ Household Products |   449 |   579 |   200929.00 |   47825.80 |       23.8 |              8.9 | Medium margin
+ Beverages          |   673 |  1235 |   232359.78 |   47614.26 |       20.5 |              8.8 | Medium margin
+(6 rows)
+
+WITH monthly AS (
+    SELECT
+        DATE_TRUNC('month', o.transaction_date)::date AS month,
+        COUNT(DISTINCT o.order_id)                    AS orders,
+        SUM(s.total_amount)                           AS revenue_kes,
+        SUM(s.profit)                                 AS profit_kes
+    FROM sales_transactions s
+    JOIN orders o ON o.order_id = s.order_id
+    GROUP BY 1
+)
+SELECT
+    TO_CHAR(month, 'YYYY-MM')                                                   AS month,
+    orders,
+    revenue_kes,
+    profit_kes,
+    ROUND(100.0 * (revenue_kes / LAG(revenue_kes) OVER (ORDER BY month) - 1), 1)     AS mom_growth_pct,
+    ROUND(100.0 * (revenue_kes / LAG(revenue_kes, 12) OVER (ORDER BY month) - 1), 1) AS yoy_growth_pct,
+    ROUND(AVG(revenue_kes) OVER (ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 0) AS rolling_3m_avg_kes,
+    SUM(revenue_kes) OVER (ORDER BY month)                                      AS running_total_kes
+FROM monthly
+ORDER BY month;
+  month  | orders | revenue_kes | profit_kes | mom_growth_pct | yoy_growth_pct | rolling_3m_avg_kes | running_total_kes 
+---------+--------+-------------+------------+----------------+----------------+--------------------+-------------------
+ 2024-01 |     74 |    64546.50 |   13011.50 |                |                |              64547 |          64546.50
+ 2024-02 |     81 |    73164.00 |   21821.00 |           13.4 |                |              68855 |         137710.50
+ 2024-03 |    123 |   106283.50 |   24151.50 |           45.3 |                |              81331 |         243994.00
+ 2024-04 |    132 |   106346.60 |   26894.60 |            0.1 |                |              95265 |         350340.60
+ 2024-05 |    117 |    93057.50 |   24707.50 |          -12.5 |                |             101896 |         443398.10
+ 2024-06 |    104 |    76564.50 |   18332.50 |          -17.7 |                |              91990 |         519962.60
+ 2024-07 |     92 |    67533.50 |   14587.50 |          -11.8 |                |              79052 |         587496.10
+ 2024-08 |    110 |    72570.00 |   19199.00 |            7.5 |                |              72223 |         660066.10
+ 2024-09 |    105 |   104450.50 |   25256.50 |           43.9 |                |              81518 |         764516.60
+ 2024-10 |    100 |    60595.00 |   15376.00 |          -42.0 |                |              79205 |         825111.60
+ 2024-11 |    115 |    99185.00 |   22807.00 |           63.7 |                |              88077 |         924296.60
+ 2024-12 |    147 |   119317.00 |   29612.00 |           20.3 |                |              93032 |        1043613.60
+ 2025-01 |     83 |    70471.30 |   18190.50 |          -40.9 |            9.2 |              96324 |        1114084.90
+ 2025-02 |     90 |    86166.84 |   23101.24 |           22.3 |           17.8 |              91985 |        1200251.74
+ 2025-03 |     92 |    84029.80 |   20726.04 |           -2.5 |          -20.9 |              80223 |        1284281.54
+ 2025-04 |    123 |    91046.88 |   19339.92 |            8.4 |          -14.4 |              87081 |        1375328.42
+ 2025-05 |    113 |    98378.80 |   25940.72 |            8.1 |            5.7 |              91152 |        1473707.22
+ 2025-06 |    120 |   111927.80 |   26945.24 |           13.8 |           46.2 |             100451 |        1585635.02
+ 2025-07 |    114 |   109353.20 |   26746.00 |           -2.3 |           61.9 |             106553 |        1694988.22
+ 2025-08 |    116 |    78915.20 |   19797.44 |          -27.8 |            8.7 |             100065 |        1773903.42
+ 2025-09 |    113 |    78927.20 |   18771.52 |            0.0 |          -24.4 |              89065 |        1852830.62
+ 2025-10 |    103 |    96734.00 |   26478.88 |           22.6 |           59.6 |              84859 |        1949564.62
+ 2025-11 |    128 |    88842.60 |   21210.36 |           -8.2 |          -10.4 |              88168 |        2038407.22
+ 2025-12 |    155 |   140807.50 |   35797.66 |           58.5 |           18.0 |             108795 |        2179214.72
+(24 rows)
+
+SELECT
+    metric,
+    y2024,
+    y2025,
+    ROUND(100.0 * (y2025 / y2024 - 1), 1) AS growth_pct
+FROM (
+    SELECT 'Revenue (KES)' AS metric,
+           SUM(CASE WHEN EXTRACT(YEAR FROM o.transaction_date) = 2024 THEN s.total_amount END) AS y2024,
+           SUM(CASE WHEN EXTRACT(YEAR FROM o.transaction_date) = 2025 THEN s.total_amount END) AS y2025
+    FROM sales_transactions s JOIN orders o ON o.order_id = s.order_id
+    UNION ALL
+    SELECT 'Profit (KES)',
+           SUM(CASE WHEN EXTRACT(YEAR FROM o.transaction_date) = 2024 THEN s.profit END),
+           SUM(CASE WHEN EXTRACT(YEAR FROM o.transaction_date) = 2025 THEN s.profit END)
+    FROM sales_transactions s JOIN orders o ON o.order_id = s.order_id
+    UNION ALL
+    SELECT 'Units sold',
+           SUM(CASE WHEN EXTRACT(YEAR FROM o.transaction_date) = 2024 THEN s.quantity END),
+           SUM(CASE WHEN EXTRACT(YEAR FROM o.transaction_date) = 2025 THEN s.quantity END)
+    FROM sales_transactions s JOIN orders o ON o.order_id = s.order_id
+    UNION ALL
+    SELECT 'Orders',
+           COUNT(*) FILTER (WHERE EXTRACT(YEAR FROM transaction_date) = 2024),
+           COUNT(*) FILTER (WHERE EXTRACT(YEAR FROM transaction_date) = 2025)
+    FROM orders
+) t;
+    metric     |   y2024    |   y2025    | growth_pct 
+---------------+------------+------------+------------
+ Revenue (KES) | 1043613.60 | 1135601.12 |        8.8
+ Profit (KES)  |  255756.60 |  283045.52 |       10.7
+ Units sold    |       2447 |       2332 |       -4.7
+ Orders        |       1300 |       1350 |        3.8
+(4 rows)
+
+WITH order_values AS (
+    SELECT o.order_id, o.store_id, o.payment_method, SUM(s.total_amount) AS order_value
+    FROM orders o
+    JOIN sales_transactions s ON s.order_id = o.order_id
+    GROUP BY o.order_id, o.store_id, o.payment_method
+)
+SELECT
+    'All orders'                                                      AS segment,
+    COUNT(*)                                                          AS orders,
+    ROUND(AVG(order_value), 2)                                        AS avg_order_value_kes,
+    ROUND(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY order_value)::numeric, 2) AS median_order_value_kes
+FROM order_values
+UNION ALL
+SELECT st.store_name, COUNT(*), ROUND(AVG(order_value), 2),
+       ROUND(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY order_value)::numeric, 2)
+FROM order_values ov JOIN stores st ON st.store_id = ov.store_id
+GROUP BY st.store_name
+UNION ALL
+SELECT 'Paid by ' || payment_method, COUNT(*), ROUND(AVG(order_value), 2),
+       ROUND(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY order_value)::numeric, 2)
+FROM order_values
+GROUP BY payment_method
+ORDER BY orders DESC;
+          segment          | orders | avg_order_value_kes | median_order_value_kes 
+---------------------------+--------+---------------------+------------------------
+ All orders                |   2650 |              822.35 |                 450.00
+ Paid by M-Pesa            |   1479 |              782.23 |                 450.00
+ Paid by Cash              |    643 |              657.72 |                 395.00
+ Duka Bora Nairobi CBD     |    643 |              818.00 |                 450.00
+ Duka Bora Westlands       |    482 |              898.72 |                 480.00
+ Duka Bora Mombasa         |    458 |              676.55 |                 410.92
+ Paid by Debit/Credit Card |    401 |             1057.45 |                 541.00
+ Duka Bora Nakuru          |    371 |              905.00 |                 468.00
+ Duka Bora Kisumu          |    356 |              892.43 |                 480.00
+ Duka Bora Thika           |    340 |              755.10 |                 438.00
+ Paid by Bank Transfer     |    120 |             1440.38 |                 800.00
+ Paid by Unknown           |      7 |              357.29 |                 312.00
+(12 rows)
+
+WITH days AS (
+    SELECT day_of_week_num, day_of_week, COUNT(*) AS calendar_days
+    FROM calendar
+    GROUP BY day_of_week_num, day_of_week
+),
+by_day AS (
+    SELECT c.day_of_week_num,
+           COUNT(DISTINCT o.order_id) AS orders,
+           SUM(s.total_amount)        AS revenue_kes
+    FROM orders o
+    JOIN calendar c           ON c.calendar_date = o.transaction_date
+    JOIN sales_transactions s ON s.order_id = o.order_id
+    GROUP BY c.day_of_week_num
+)
+SELECT d.day_of_week_num, d.day_of_week, d.calendar_days, b.orders, b.revenue_kes,
+       ROUND(b.orders::numeric / d.calendar_days, 2) AS orders_per_calendar_day
+FROM days d
+JOIN by_day b USING (day_of_week_num)
+ORDER BY d.day_of_week_num;
+ day_of_week_num | day_of_week | calendar_days | orders | revenue_kes | orders_per_calendar_day 
+-----------------+-------------+---------------+--------+-------------+-------------------------
+               1 | Monday      |           105 |    315 |   267603.17 |                    3.00
+               2 | Tuesday     |           105 |    321 |   244785.75 |                    3.06
+               3 | Wednesday   |           105 |    338 |   277451.13 |                    3.22
+               4 | Thursday    |           104 |    373 |   313181.53 |                    3.59
+               5 | Friday      |           104 |    439 |   379660.27 |                    4.22
+               6 | Saturday    |           104 |    470 |   384201.85 |                    4.52
+               7 | Sunday      |           104 |    394 |   312331.02 |                    3.79
+(7 rows)
+
+WITH store_product AS (
+    SELECT st.store_name, p.product_name, SUM(s.quantity) AS units,
+           ROW_NUMBER() OVER (PARTITION BY st.store_name ORDER BY SUM(s.quantity) DESC, p.product_name) AS rn
+    FROM sales_transactions s
+    JOIN orders o   ON o.order_id = s.order_id
+    JOIN stores st  ON st.store_id = o.store_id
+    JOIN products p ON p.product_id = s.product_id
+    GROUP BY st.store_name, p.product_name
+)
+SELECT store_name, product_name AS top_product_by_units, units
+FROM store_product
+WHERE rn = 1
+ORDER BY units DESC;
+      store_name       | top_product_by_units | units 
+-----------------------+----------------------+-------
+ Duka Bora Nairobi CBD | Fresh Milk           |   148
+ Duka Bora Nakuru      | Bottled Water        |   106
+ Duka Bora Thika       | Fresh Milk           |    84
+ Duka Bora Westlands   | Fresh Milk           |    82
+ Duka Bora Mombasa     | Fresh Milk           |    80
+ Duka Bora Kisumu      | Maize Flour          |    59
+(6 rows)
+

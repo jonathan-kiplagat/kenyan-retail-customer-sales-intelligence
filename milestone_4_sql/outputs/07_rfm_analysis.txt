@@ -1,0 +1,178 @@
+SET search_path TO retail;
+SET
+CREATE OR REPLACE VIEW v_customer_rfm AS
+WITH scored AS (
+    SELECT
+        customer_id,
+        days_since_last_purchase AS recency_days,
+        orders                   AS frequency,
+        total_spend_kes          AS monetary_kes,
+        CASE WHEN days_since_last_purchase <= 90  THEN 5
+             WHEN days_since_last_purchase <= 180 THEN 4
+             WHEN days_since_last_purchase <= 365 THEN 3
+             WHEN days_since_last_purchase <= 545 THEN 2
+             ELSE 1 END                                         AS r_score,
+        CASE WHEN orders >= 6 THEN 5
+             WHEN orders >= 4 THEN 4
+             WHEN orders = 3  THEN 3
+             WHEN orders = 2  THEN 2
+             ELSE 1 END                                         AS f_score,
+        NTILE(5) OVER (ORDER BY total_spend_kes)                AS m_score    -- highest spend -> 5
+    FROM v_customer_summary
+)
+SELECT
+    *,
+    r_score::text || f_score::text || m_score::text AS rfm_code,
+    CASE
+        -- Active in the last 6 months (R4-R5)
+        WHEN r_score >= 4 AND f_score >= 4                  THEN 'Champions'
+        WHEN r_score >= 4 AND f_score = 3                   THEN 'Loyal Customers'
+        WHEN r_score >= 4 AND f_score = 2                   THEN 'Potential Loyalists'
+        WHEN r_score >= 4 AND f_score = 1                   THEN 'New / Recent One-off'
+        -- Silent for more than 6 months but previously frequent
+        WHEN f_score >= 4 AND m_score = 5                   THEN 'Cannot Lose Them'
+        WHEN f_score >= 3                                   THEN 'At Risk'
+        -- Silent for more than 6 months, infrequent
+        WHEN r_score = 3                                    THEN 'Needs Attention'
+        WHEN r_score = 2                                    THEN 'Hibernating'
+        ELSE 'Lost'
+    END AS rfm_segment
+FROM scored;
+CREATE VIEW
+SELECT
+    r_score AS score,
+    MIN(recency_days) AS recency_from_days, MAX(recency_days) AS recency_to_days
+FROM v_customer_rfm GROUP BY r_score ORDER BY r_score;
+ score | recency_from_days | recency_to_days 
+-------+-------------------+-----------------
+     1 |               546 |             730
+     2 |               366 |             545
+     3 |               181 |             365
+     4 |                91 |             180
+     5 |                 0 |              89
+(5 rows)
+
+SELECT
+    m_score AS score,
+    MIN(monetary_kes) AS spend_from_kes, MAX(monetary_kes) AS spend_to_kes
+FROM v_customer_rfm GROUP BY m_score ORDER BY m_score;
+ score | spend_from_kes | spend_to_kes 
+-------+----------------+--------------
+     1 |          65.00 |       248.20
+     2 |         249.00 |       468.00
+     3 |         468.00 |       800.00
+     4 |         800.00 |      1800.00
+     5 |        1800.00 |     27887.00
+(5 rows)
+
+SELECT
+    rfm_segment,
+    COUNT(*)                                                         AS customers,
+    ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 1)               AS customer_share_pct,
+    ROUND(AVG(recency_days), 0)                                      AS avg_recency_days,
+    ROUND(AVG(frequency), 1)                                         AS avg_orders,
+    ROUND(AVG(monetary_kes), 0)                                      AS avg_spend_kes,
+    SUM(monetary_kes)                                                AS revenue_kes,
+    ROUND(100.0 * SUM(monetary_kes) / SUM(SUM(monetary_kes)) OVER (), 1) AS revenue_share_pct
+FROM v_customer_rfm
+GROUP BY rfm_segment
+ORDER BY revenue_kes DESC;
+     rfm_segment      | customers | customer_share_pct | avg_recency_days | avg_orders | avg_spend_kes | revenue_kes | revenue_share_pct 
+----------------------+-----------+--------------------+------------------+------------+---------------+-------------+-------------------
+ Needs Attention      |       394 |               22.0 |              269 |        1.1 |          1018 |   401015.88 |              18.5
+ Lost                 |       395 |               22.1 |              629 |        1.2 |           955 |   377239.40 |              17.4
+ Hibernating          |       413 |               23.1 |              449 |        1.2 |           873 |   360480.90 |              16.7
+ Champions            |        68 |                3.8 |               50 |        5.6 |          4695 |   319250.35 |              14.7
+ New / Recent One-off |       361 |               20.2 |               86 |        1.0 |           847 |   305783.85 |              14.1
+ Cannot Lose Them     |        31 |                1.7 |              396 |        5.8 |          5514 |   170927.12 |               7.9
+ Potential Loyalists  |        67 |                3.7 |               73 |        2.0 |          1551 |   103948.80 |               4.8
+ Loyal Customers      |        35 |                2.0 |               64 |        3.0 |          1908 |    66783.36 |               3.1
+ At Risk              |        24 |                1.3 |              361 |        3.2 |          2469 |    59249.86 |               2.7
+(9 rows)
+
+SELECT
+    r_score,
+    COUNT(*) FILTER (WHERE f_score = 1) AS f1_one_order,
+    COUNT(*) FILTER (WHERE f_score = 2) AS f2_two_orders,
+    COUNT(*) FILTER (WHERE f_score = 3) AS f3_three_orders,
+    COUNT(*) FILTER (WHERE f_score = 4) AS f4_four_five,
+    COUNT(*) FILTER (WHERE f_score = 5) AS f5_six_plus
+FROM v_customer_rfm
+GROUP BY r_score
+ORDER BY r_score DESC;
+ r_score | f1_one_order | f2_two_orders | f3_three_orders | f4_four_five | f5_six_plus 
+---------+--------------+---------------+-----------------+--------------+-------------
+       5 |          183 |            42 |              24 |           36 |          19
+       4 |          178 |            25 |              11 |           12 |           1
+       3 |          335 |            59 |               9 |           11 |           6
+       2 |          340 |            73 |               8 |            8 |           3
+       1 |          333 |            62 |               4 |            0 |           6
+(5 rows)
+
+SELECT customer_id, recency_days, frequency, monetary_kes, rfm_code
+FROM v_customer_rfm
+WHERE rfm_segment = 'Champions'
+ORDER BY monetary_kes DESC
+LIMIT 10;
+ customer_id | recency_days | frequency | monetary_kes | rfm_code 
+-------------+--------------+-----------+--------------+----------
+ C0066       |            0 |         5 |     27887.00 | 545
+ C0824       |           35 |        10 |     22423.00 | 555
+ C0916       |            7 |         5 |     17624.00 | 545
+ C0223       |           41 |        10 |     10066.85 | 555
+ C0332       |           39 |         5 |      9741.00 | 545
+ C1185       |           19 |         9 |      8777.00 | 555
+ C1728       |            5 |         4 |      8191.95 | 545
+ C1174       |            6 |        11 |      7657.00 | 555
+ C0288       |            1 |         6 |      7515.00 | 555
+ C0192       |           73 |        11 |      7441.00 | 555
+(10 rows)
+
+SELECT r.customer_id, r.rfm_segment, r.recency_days, r.frequency, r.monetary_kes,
+       st.town AS preferred_store, c.loyalty_member
+FROM v_customer_rfm r
+JOIN customers c ON c.customer_id = r.customer_id
+JOIN stores st   ON st.store_id = c.preferred_store_id
+WHERE r.rfm_segment IN ('Cannot Lose Them', 'At Risk')
+ORDER BY r.monetary_kes DESC
+LIMIT 15;
+ customer_id |   rfm_segment    | recency_days | frequency | monetary_kes | preferred_store | loyalty_member 
+-------------+------------------+--------------+-----------+--------------+-----------------+----------------
+ C0046       | Cannot Lose Them |          272 |         9 |     23743.00 | Nairobi CBD     | t
+ C0370       | Cannot Lose Them |          380 |         5 |     16515.00 | Nairobi CBD     | t
+ C0553       | Cannot Lose Them |          325 |         8 |      9815.52 | Westlands       | t
+ C0985       | Cannot Lose Them |          473 |         5 |      8501.00 | Westlands       | t
+ C0724       | Cannot Lose Them |          603 |         7 |      7527.00 | Kisumu Town     | t
+ C0731       | At Risk          |          370 |         3 |      6751.00 | Nakuru Town     | t
+ C0095       | Cannot Lose Them |          342 |         4 |      6174.00 | Kisumu Town     | t
+ C1096       | Cannot Lose Them |          187 |         6 |      6165.00 | Westlands       | t
+ C0140       | Cannot Lose Them |          430 |        11 |      5871.00 | Thika           | t
+ C0411       | Cannot Lose Them |          311 |         9 |      5679.00 | Mombasa Town    | t
+ C0756       | Cannot Lose Them |          586 |         6 |      5665.00 | Nairobi CBD     | t
+ C0694       | Cannot Lose Them |          187 |         4 |      5552.90 | Kisumu Town     | t
+ C1150       | Cannot Lose Them |          324 |         8 |      5549.00 | Nairobi CBD     | t
+ C0913       | Cannot Lose Them |          454 |         7 |      5535.00 | Westlands       | f
+ C0732       | At Risk          |          611 |         3 |      5480.00 | Kisumu Town     | t
+(15 rows)
+
+SELECT
+    st.town AS preferred_store,
+    COUNT(*)                                                                    AS customers,
+    COUNT(*) FILTER (WHERE r.rfm_segment IN ('Champions', 'Loyal Customers'))   AS champions_or_loyal,
+    COUNT(*) FILTER (WHERE r.rfm_segment IN ('At Risk', 'Cannot Lose Them'))    AS at_risk,
+    ROUND(100.0 * COUNT(*) FILTER (WHERE r.rfm_segment IN ('At Risk', 'Cannot Lose Them')) / COUNT(*), 1) AS at_risk_pct
+FROM v_customer_rfm r
+JOIN customers c ON c.customer_id = r.customer_id
+JOIN stores st   ON st.store_id = c.preferred_store_id
+GROUP BY st.town
+ORDER BY at_risk_pct DESC;
+ preferred_store | customers | champions_or_loyal | at_risk | at_risk_pct 
+-----------------+-----------+--------------------+---------+-------------
+ Thika           |       219 |                  9 |      10 |         4.6
+ Kisumu Town     |       233 |                 12 |      10 |         4.3
+ Mombasa Town    |       297 |                 23 |      11 |         3.7
+ Nairobi CBD     |       454 |                 23 |      14 |         3.1
+ Westlands       |       340 |                 17 |       7 |         2.1
+ Nakuru Town     |       245 |                 19 |       3 |         1.2
+(6 rows)
+

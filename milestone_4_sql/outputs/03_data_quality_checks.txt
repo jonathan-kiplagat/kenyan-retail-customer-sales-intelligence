@@ -1,0 +1,121 @@
+SET search_path TO retail;
+SET
+SELECT 'orders' AS table_name, COUNT(*) AS actual_rows, 2650 AS expected_rows FROM orders
+UNION ALL SELECT 'sales_transactions', COUNT(*), 2988 FROM sales_transactions
+UNION ALL SELECT 'customers', COUNT(*), 1800 FROM customers
+UNION ALL SELECT 'products', COUNT(*), 40 FROM products
+UNION ALL SELECT 'stores', COUNT(*), 6 FROM stores;
+     table_name     | actual_rows | expected_rows 
+--------------------+-------------+---------------
+ orders             |        2650 |          2650
+ sales_transactions |        2988 |          2988
+ customers          |        1800 |          1800
+ products           |          40 |            40
+ stores             |           6 |             6
+(5 rows)
+
+SELECT
+    COUNT(*) FILTER (WHERE o.order_id IS NULL)                              AS lines_without_order,
+    COUNT(*) FILTER (WHERE p.product_id IS NULL)                            AS lines_without_product,
+    COUNT(*) FILTER (WHERE s.promotion_id IS NOT NULL AND pr.promotion_id IS NULL) AS lines_with_unknown_promo
+FROM sales_transactions s
+LEFT JOIN orders o      ON o.order_id = s.order_id
+LEFT JOIN products p    ON p.product_id = s.product_id
+LEFT JOIN promotions pr ON pr.promotion_id = s.promotion_id;
+ lines_without_order | lines_without_product | lines_with_unknown_promo 
+---------------------+-----------------------+--------------------------
+                   0 |                     0 |                        0
+(1 row)
+
+SELECT COUNT(*) AS orders_without_lines
+FROM orders o
+WHERE NOT EXISTS (SELECT 1 FROM sales_transactions s WHERE s.order_id = o.order_id);
+ orders_without_lines 
+----------------------
+                    0
+(1 row)
+
+SELECT
+    COUNT(*) FILTER (WHERE customer_id IS NULL)       AS walk_in_orders,
+    COUNT(*) FILTER (WHERE payment_method = 'Unknown') AS unknown_payment_orders,
+    COUNT(*) FILTER (WHERE store_id IS NULL)          AS orders_missing_store
+FROM orders;
+ walk_in_orders | unknown_payment_orders | orders_missing_store 
+----------------+------------------------+----------------------
+             21 |                      7 |                    0
+(1 row)
+
+SELECT MIN(transaction_date) AS first_order, MAX(transaction_date) AS last_order,
+       COUNT(*) FILTER (WHERE transaction_date NOT BETWEEN '2024-01-01' AND '2025-12-31') AS out_of_range
+FROM orders;
+ first_order | last_order | out_of_range 
+-------------+------------+--------------
+ 2024-01-01  | 2025-12-31 |            0
+(1 row)
+
+SELECT
+    COUNT(*)                                                                     AS lines_compared,
+    COUNT(*) FILTER (WHERE ABS(s.total_amount   - st.total_amount::numeric)    > 0.01) AS total_mismatches,
+    COUNT(*) FILTER (WHERE ABS(s.discount_amount - st.discount_amount::numeric) > 0.01) AS discount_mismatches,
+    COUNT(*) FILTER (WHERE ABS(s.profit         - st.profit::numeric)          > 0.01) AS profit_mismatches,
+    SUM(s.total_amount)                                                          AS db_revenue,
+    SUM(st.total_amount::numeric)                                                AS csv_revenue
+FROM sales_transactions s
+JOIN staging.sales st ON st.transaction_id = s.transaction_id;
+ lines_compared | total_mismatches | discount_mismatches | profit_mismatches | db_revenue | csv_revenue 
+----------------+------------------+---------------------+-------------------+------------+-------------
+           2988 |                0 |                   0 |                 0 | 2179214.72 |  2179214.72
+(1 row)
+
+SELECT
+    COUNT(*) FILTER (WHERE o.transaction_date NOT BETWEEN pr.start_date AND pr.end_date) AS outside_window,
+    COUNT(*) FILTER (WHERE s.discount_percentage <> pr.discount_percentage)              AS wrong_discount,
+    COUNT(*) FILTER (WHERE p.category <> pr.target_category)                             AS wrong_category
+FROM sales_transactions s
+JOIN orders o      ON o.order_id = s.order_id
+JOIN products p    ON p.product_id = s.product_id
+JOIN promotions pr ON pr.promotion_id = s.promotion_id;
+ outside_window | wrong_discount | wrong_category 
+----------------+----------------+----------------
+              0 |              0 |              0
+(1 row)
+
+SELECT COUNT(*) AS registered_after_first_purchase
+FROM customers c
+JOIN (SELECT customer_id, MIN(transaction_date) AS first_purchase
+      FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id) f USING (customer_id)
+WHERE c.registration_date > f.first_purchase;
+ registered_after_first_purchase 
+---------------------------------
+                               0
+(1 row)
+
+SELECT tc.table_name, tc.constraint_type, COUNT(*) AS constraints
+FROM information_schema.table_constraints tc
+WHERE tc.table_schema = 'retail' AND tc.constraint_type IN ('PRIMARY KEY', 'FOREIGN KEY', 'UNIQUE', 'CHECK')
+  AND tc.constraint_name NOT LIKE '%_not_null'
+GROUP BY tc.table_name, tc.constraint_type
+ORDER BY tc.table_name, tc.constraint_type;
+     table_name     | constraint_type | constraints 
+--------------------+-----------------+-------------
+ calendar           | CHECK           |           3
+ calendar           | PRIMARY KEY     |           1
+ customers          | CHECK           |           1
+ customers          | FOREIGN KEY     |           1
+ customers          | PRIMARY KEY     |           1
+ orders             | CHECK           |           1
+ orders             | FOREIGN KEY     |           3
+ orders             | PRIMARY KEY     |           1
+ products           | CHECK           |           4
+ products           | PRIMARY KEY     |           1
+ promotions         | CHECK           |           2
+ promotions         | PRIMARY KEY     |           1
+ sales_transactions | CHECK           |           5
+ sales_transactions | FOREIGN KEY     |           3
+ sales_transactions | PRIMARY KEY     |           1
+ sales_transactions | UNIQUE          |           1
+ stores             | CHECK           |           2
+ stores             | PRIMARY KEY     |           1
+ stores             | UNIQUE          |           1
+(19 rows)
+

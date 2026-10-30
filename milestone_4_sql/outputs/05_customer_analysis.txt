@@ -1,0 +1,177 @@
+SET search_path TO retail;
+SET
+CREATE OR REPLACE VIEW v_customer_summary AS
+SELECT
+    o.customer_id,
+    COUNT(DISTINCT o.order_id)                       AS orders,
+    SUM(s.total_amount)                              AS total_spend_kes,
+    SUM(s.profit)                                    AS total_profit_kes,
+    MIN(o.transaction_date)                          AS first_purchase,
+    MAX(o.transaction_date)                          AS last_purchase,
+    DATE '2025-12-31' - MAX(o.transaction_date)      AS days_since_last_purchase
+FROM orders o
+JOIN sales_transactions s ON s.order_id = o.order_id
+WHERE o.customer_id IS NOT NULL
+GROUP BY o.customer_id;
+CREATE VIEW
+SELECT
+    RANK() OVER (ORDER BY cs.total_spend_kes DESC)        AS spend_rank,
+    cs.customer_id,
+    c.loyalty_member,
+    st.town                                               AS preferred_store,
+    cs.orders,
+    cs.total_spend_kes,
+    ROUND(cs.total_spend_kes / cs.orders, 2)              AS avg_order_value_kes,
+    cs.last_purchase,
+    cs.days_since_last_purchase
+FROM v_customer_summary cs
+JOIN customers c ON c.customer_id = cs.customer_id
+JOIN stores st   ON st.store_id = c.preferred_store_id
+ORDER BY spend_rank
+LIMIT 10;
+ spend_rank | customer_id | loyalty_member | preferred_store | orders | total_spend_kes | avg_order_value_kes | last_purchase | days_since_last_purchase 
+------------+-------------+----------------+-----------------+--------+-----------------+---------------------+---------------+--------------------------
+          1 | C0066       | t              | Thika           |      5 |        27887.00 |             5577.40 | 2025-12-31    |                        0
+          2 | C1527       | f              | Westlands       |      1 |        24044.00 |            24044.00 | 2025-06-05    |                      209
+          3 | C0046       | t              | Nairobi CBD     |      9 |        23743.00 |             2638.11 | 2025-04-03    |                      272
+          4 | C0824       | f              | Nakuru Town     |     10 |        22423.00 |             2242.30 | 2025-11-26    |                       35
+          5 | C0916       | t              | Nairobi CBD     |      5 |        17624.00 |             3524.80 | 2025-12-24    |                        7
+          6 | C0370       | t              | Nairobi CBD     |      5 |        16515.00 |             3303.00 | 2024-12-16    |                      380
+          7 | C0713       | f              | Nakuru Town     |      2 |        16000.00 |             8000.00 | 2024-04-22    |                      618
+          8 | C0802       | f              | Thika           |      1 |        15949.00 |            15949.00 | 2025-10-31    |                       61
+          9 | C0324       | t              | Nairobi CBD     |      1 |        15599.00 |            15599.00 | 2025-07-17    |                      167
+          9 | C1406       | f              | Kisumu Town     |      1 |        15599.00 |            15599.00 | 2025-03-15    |                      291
+(10 rows)
+
+SELECT
+    cs.customer_id,
+    cs.orders,
+    cs.total_spend_kes,
+    cs.last_purchase,
+    cs.days_since_last_purchase,
+    CASE
+        WHEN cs.days_since_last_purchase > 365 THEN 'Silent > 1 year'
+        WHEN cs.days_since_last_purchase > 270 THEN 'Silent 9-12 months'
+        ELSE 'Silent 6-9 months'
+    END AS inactivity_band
+FROM v_customer_summary cs
+WHERE cs.orders >= 2
+  AND cs.days_since_last_purchase > 180
+ORDER BY cs.total_spend_kes DESC
+LIMIT 15;
+ customer_id | orders | total_spend_kes | last_purchase | days_since_last_purchase |  inactivity_band   
+-------------+--------+-----------------+---------------+--------------------------+--------------------
+ C0046       |      9 |        23743.00 | 2025-04-03    |                      272 | Silent 9-12 months
+ C0370       |      5 |        16515.00 | 2024-12-16    |                      380 | Silent > 1 year
+ C0713       |      2 |        16000.00 | 2024-04-22    |                      618 | Silent > 1 year
+ C0553       |      8 |         9815.52 | 2025-02-09    |                      325 | Silent 9-12 months
+ C0985       |      5 |         8501.00 | 2024-09-14    |                      473 | Silent > 1 year
+ C0724       |      7 |         7527.00 | 2024-05-07    |                      603 | Silent > 1 year
+ C0104       |      2 |         7200.00 | 2024-03-19    |                      652 | Silent > 1 year
+ C0731       |      3 |         6751.00 | 2024-12-26    |                      370 | Silent > 1 year
+ C0081       |      2 |         6460.00 | 2024-09-23    |                      464 | Silent > 1 year
+ C0095       |      4 |         6174.00 | 2025-01-23    |                      342 | Silent 9-12 months
+ C1096       |      6 |         6165.00 | 2025-06-27    |                      187 | Silent 6-9 months
+ C0162       |      2 |         5890.56 | 2025-02-08    |                      326 | Silent 9-12 months
+ C0140       |     11 |         5871.00 | 2024-10-27    |                      430 | Silent > 1 year
+ C0411       |      9 |         5679.00 | 2025-02-23    |                      311 | Silent 9-12 months
+ C0756       |      6 |         5665.00 | 2024-05-24    |                      586 | Silent > 1 year
+(15 rows)
+
+SELECT
+    CASE
+        WHEN days_since_last_purchase > 365 THEN '1. Silent > 1 year'
+        WHEN days_since_last_purchase > 270 THEN '2. Silent 9-12 months'
+        WHEN days_since_last_purchase > 180 THEN '3. Silent 6-9 months'
+        ELSE '4. Active in last 6 months'
+    END                                        AS status,
+    COUNT(*)                                   AS repeat_customers,
+    SUM(total_spend_kes)                       AS lifetime_spend_kes
+FROM v_customer_summary
+WHERE orders >= 2
+GROUP BY 1
+ORDER BY 1;
+           status           | repeat_customers | lifetime_spend_kes 
+----------------------------+------------------+--------------------
+ 1. Silent > 1 year         |              164 |          331815.40
+ 2. Silent 9-12 months      |               35 |          109291.00
+ 3. Silent 6-9 months       |               50 |          100534.39
+ 4. Active in last 6 months |              170 |          489982.51
+(4 rows)
+
+WITH deciles AS (
+    SELECT customer_id, total_spend_kes,
+           NTILE(10) OVER (ORDER BY total_spend_kes DESC) AS spend_decile
+    FROM v_customer_summary
+)
+SELECT
+    spend_decile,
+    COUNT(*)                                                          AS customers,
+    ROUND(MIN(total_spend_kes), 0)                                    AS min_spend_kes,
+    ROUND(MAX(total_spend_kes), 0)                                    AS max_spend_kes,
+    SUM(total_spend_kes)                                              AS revenue_kes,
+    ROUND(100.0 * SUM(total_spend_kes) / SUM(SUM(total_spend_kes)) OVER (), 1) AS revenue_share_pct,
+    ROUND(100.0 * SUM(SUM(total_spend_kes)) OVER (ORDER BY spend_decile)
+          / SUM(SUM(total_spend_kes)) OVER (), 1)                     AS cumulative_share_pct
+FROM deciles
+GROUP BY spend_decile
+ORDER BY spend_decile;
+ spend_decile | customers | min_spend_kes | max_spend_kes | revenue_kes | revenue_share_pct | cumulative_share_pct 
+--------------+-----------+---------------+---------------+-------------+-------------------+----------------------
+            1 |       179 |          2662 |         27887 |   936950.37 |              43.3 |                 43.3
+            2 |       179 |          1800 |          2652 |   391311.70 |              18.1 |                 61.4
+            3 |       179 |          1165 |          1800 |   258810.14 |              12.0 |                 73.3
+            4 |       179 |           800 |          1165 |   177162.84 |               8.2 |                 81.5
+            5 |       179 |           560 |           800 |   121080.27 |               5.6 |                 87.1
+            6 |       179 |           468 |           559 |    91475.30 |               4.2 |                 91.3
+            7 |       179 |           370 |           468 |    74620.52 |               3.4 |                 94.8
+            8 |       179 |           246 |           370 |    54202.61 |               2.5 |                 97.3
+            9 |       178 |           166 |           245 |    36798.00 |               1.7 |                 99.0
+           10 |       178 |            65 |           166 |    22267.77 |               1.0 |                100.0
+(10 rows)
+
+SELECT
+    CASE WHEN orders = 1 THEN '1 order'
+         WHEN orders = 2 THEN '2 orders'
+         WHEN orders BETWEEN 3 AND 5 THEN '3-5 orders'
+         ELSE '6+ orders' END                                         AS frequency_band,
+    COUNT(*)                                                          AS customers,
+    ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 1)                AS customer_share_pct,
+    SUM(total_spend_kes)                                              AS revenue_kes,
+    ROUND(100.0 * SUM(total_spend_kes) / SUM(SUM(total_spend_kes)) OVER (), 1) AS revenue_share_pct
+FROM v_customer_summary
+GROUP BY 1
+ORDER BY MIN(orders);
+ frequency_band | customers | customer_share_pct | revenue_kes | revenue_share_pct 
+----------------+-----------+--------------------+-------------+-------------------
+ 1 order        |      1369 |               76.6 |  1133056.22 |              52.3
+ 2 orders       |       261 |               14.6 |   415412.61 |              19.2
+ 3-5 orders     |       123 |                6.9 |   385132.66 |              17.8
+ 6+ orders      |        35 |                2.0 |   231078.03 |              10.7
+(4 rows)
+
+SELECT
+    c.loyalty_member,
+    COUNT(*)                                     AS customers,
+    ROUND(AVG(cs.orders), 2)                     AS avg_orders,
+    ROUND(AVG(cs.total_spend_kes), 0)            AS avg_spend_kes,
+    ROUND(100.0 * AVG(CASE WHEN cs.orders >= 2 THEN 1 ELSE 0 END), 1) AS repeat_rate_pct
+FROM v_customer_summary cs
+JOIN customers c ON c.customer_id = cs.customer_id
+GROUP BY c.loyalty_member
+ORDER BY c.loyalty_member DESC;
+ loyalty_member | customers | avg_orders | avg_spend_kes | repeat_rate_pct 
+----------------+-----------+------------+---------------+-----------------
+ t              |       580 |       1.99 |          1617 |            41.7
+ f              |      1208 |       1.22 |          1016 |            14.7
+(2 rows)
+
+SELECT
+    ROUND(100.0 * AVG(CASE WHEN o.store_id = c.preferred_store_id THEN 1 ELSE 0 END), 1) AS pct_orders_at_home_store
+FROM orders o
+JOIN customers c ON c.customer_id = o.customer_id;
+ pct_orders_at_home_store 
+--------------------------
+                     87.8
+(1 row)
+
